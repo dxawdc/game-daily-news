@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const dataDir = path.join(__dirname, 'data');
+
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
     console.log('Waiting for data files...');
@@ -9,6 +10,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort().reverse();
+
 if (files.length === 0) { 
     console.log('No data found in data/ folder.'); 
     process.exit(0); 
@@ -17,10 +19,10 @@ if (files.length === 0) {
 let historyListHtml = '';
 const articleTemplate = fs.readFileSync('template.html', 'utf-8');
 
-for (const file of files) {
+files.forEach(file => {
     const rawText = fs.readFileSync(path.join(dataDir, file), 'utf-8');
-    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-    if (lines.length === 0) continue;
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return;
 
     const dateKey = file.replace('.txt', ''); 
     const headerLine = lines[0];
@@ -34,10 +36,10 @@ for (const file of files) {
     if (countMatch) reportCount = countMatch[1];
 
     const contentText = rawText.substring(rawText.indexOf('\n')).trim();
-    const rawBlocks = contentText.split(/(?=\n\d+\.\s)/).map(b => b.trim()).filter(b => b);
+    const rawBlocks = contentText.split(/(?=\n\d+\.\s)/).map(b => b.trim()).filter(b => b.length > 0);
 
     let cardsHtml = '';
-    for (const block of rawBlocks) {
+    rawBlocks.forEach(block => {
         const titleMatch = block.match(/\d+\.\s(.*?)(?=\n|$)/);
         const titleRaw = titleMatch ? titleMatch[1].trim() : '未知标题';
         const isFeatured = titleRaw.includes('⭐ 重点推荐');
@@ -64,35 +66,29 @@ for (const file of files) {
         
         let tagClass = 'hangye';
         if (category === '出海') tagClass = 'chuhai';
-        else if (category === 'AI技术') tagClass = 'ai';
-        else if (category === '小游戏') tagClass = 'xiaoyouxi';
+        if (category === 'AI技术') tagClass = 'ai';
+        if (category === '小游戏') tagClass = 'xiaoyouxi';
 
         cardsHtml += '<div class="card ' + (isFeatured ? 'featured' : '') + '">\n';
         cardsHtml += '    <h2 class="title"><a href="' + link + '" target="_blank">' + cleanTitle + '</a></h2>\n';
-        if (summary && summary !== '暂无摘要') {
-            cardsHtml += '    <div class="summary">' + summary + '</div>\n';
-        }
+        if (summary && summary !== '暂无摘要') cardsHtml += '    <div class="summary">' + summary + '</div>\n';
         cardsHtml += '    <div class="meta">\n';
-        if (isFeatured) {
-            cardsHtml += '        <span class="tag featured-tag">⭐ 重点</span>\n';
-        }
-        if (category) {
-            cardsHtml += '        <span class="tag ' + tagClass + '">' + category + '</span>\n';
-        }
-        if (mp) {
-            cardsHtml += '        <span class="source">' + mp + '</span>\n';
-        }
+        if (isFeatured) cardsHtml += '        <span class="tag featured-tag">⭐ 重点</span>\n';
+        if (category) cardsHtml += '        <span class="tag ' + tagClass + '">' + category + '</span>\n';
+        if (mp) cardsHtml += '        <span class="source">' + mp + '</span>\n';
         cardsHtml += '        <span class="time">' + timeStr + '</span>\n';
         cardsHtml += '    </div>\n';
         cardsHtml += '</div>\n';
-    }
+    });
 
     const htmlFileName = dateKey + '.html';
     let pageHtml = articleTemplate.replace(/\{\{DATE\}\}/g, reportDate).replace(/\{\{COUNT\}\}/g, reportCount);
 
-    if (pageHtml.includes('')) {
+    const hasPlaceholder = pageHtml.includes('CARDS_CONTENT_HERE');
+    if (hasPlaceholder) {
         pageHtml = pageHtml.replace(//, cardsHtml);
-    } else {
+    }
+    if (!hasPlaceholder) {
         pageHtml = pageHtml.replace('<div class="article-list">', '<div class="article-list">\n' + cardsHtml);
     }
     
@@ -106,13 +102,15 @@ for (const file of files) {
     historyListHtml += '    </div>\n';
     historyListHtml += '    <div class="history-arrow">→</div>\n';
     historyListHtml += '</a>\n';
-}
+});
 
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
 
-if (indexTpl.includes('')) {
+const hasHistoryPlaceholder = indexTpl.includes('HISTORY_LIST_HERE');
+if (hasHistoryPlaceholder) {
     indexTpl = indexTpl.replace(//, historyListHtml);
-} else {
+}
+if (!hasHistoryPlaceholder) {
     indexTpl = indexTpl.replace('<div class="history-list">', '<div class="history-list">\n' + historyListHtml);
 }
 
