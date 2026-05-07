@@ -3,63 +3,48 @@ const path = require('path');
 
 const dataDir = path.join(__dirname, 'data');
 
+// 1. 检查并初始化目录
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
-    console.log("Create empty data dir.");
+    console.log('初始化 data 目录完成');
     process.exit(0);
 }
 
-const files = fs.readdirSync(dataDir).filter(function(f) {
-    return f.indexOf('.txt') !== -1;
-}).sort().reverse();
-
+// 2. 读取所有 txt 文件
+const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort().reverse();
 if (files.length === 0) {
-    console.log("No data files.");
+    console.log('未找到任何数据文件');
     process.exit(0);
 }
 
-let historyListHtml = "";
+let historyListHtml = '';
 const articleTemplate = fs.readFileSync('template.html', 'utf-8');
 
-files.forEach(function(file) {
+// 3. 遍历生成每一天的日报
+files.forEach(file => {
     const rawText = fs.readFileSync(path.join(dataDir, file), 'utf-8');
-    const rawLines = rawText.split('\n');
-    const lines = [];
-    for (let i = 0; i < rawLines.length; i++) {
-        if (rawLines[i].trim()) lines.push(rawLines[i].trim());
-    }
-
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
     if (lines.length === 0) return;
 
-    const dateKey = file.replace('.txt', '');
+    const dateKey = file.replace('.txt', ''); 
     const headerLine = lines[0];
-
-    let reportDate = dateKey;
+    
+    // 解析标题和数量
     const dateMatch = headerLine.match(/(.*?)游戏圈日报/);
-    if (dateMatch) {
-        reportDate = dateMatch[1];
-    }
-
-    let reportCount = "0";
     const countMatch = headerLine.match(/共\s*(\d+)\s*篇/);
-    if (countMatch) {
-        reportCount = countMatch[1];
-    }
+    const reportDate = dateMatch ? dateMatch[1] : dateKey;
+    const reportCount = countMatch ? countMatch[1] : '0';
 
+    // 解析文章区块
     const contentText = rawText.substring(rawText.indexOf('\n')).trim();
-    const rawBlocksRaw = contentText.split(/(?=\n\d+\.\s)/);
-    const rawBlocks = [];
-    for (let i = 0; i < rawBlocksRaw.length; i++) {
-        if (rawBlocksRaw[i].trim()) rawBlocks.push(rawBlocksRaw[i].trim());
-    }
+    const rawBlocks = contentText.split(/(?=\n\d+\.\s)/).map(b => b.trim()).filter(b => b);
 
-    let cardsHtml = "";
-
-    rawBlocks.forEach(function(block) {
+    let cardsHtml = '';
+    rawBlocks.forEach(block => {
         const titleMatch = block.match(/\d+\.\s(.*?)(?=\n|$)/);
-        const titleRaw = titleMatch ? titleMatch[1].trim() : "未知标题";
-        const isFeatured = titleRaw.indexOf("⭐ 重点推荐") !== -1;
-        const cleanTitle = titleRaw.replace("⭐ 重点推荐", "").trim();
+        const titleRaw = titleMatch ? titleMatch[1].trim() : '未知标题';
+        const isFeatured = titleRaw.includes('⭐ 重点推荐');
+        const cleanTitle = titleRaw.replace('⭐ 重点推荐', '').trim();
 
         const mpMatch = block.match(/公众号：(.*?)(?=\s|　|分类：|$)/);
         const categoryMatch = block.match(/分类：(.*?)(?=\n|$)/);
@@ -67,72 +52,82 @@ files.forEach(function(file) {
         const timeMatch = block.match(/发布时间：(.*?)(?=\n|$)/);
         const linkMatch = block.match(/原文链接：(.*?)(?=\n|$)/);
 
-        const mp = mpMatch ? mpMatch[1].trim() : "";
-        const category = categoryMatch ? categoryMatch[1].trim() : "";
-        const summary = summaryMatch ? summaryMatch[1].trim() : "";
-        const link = linkMatch ? linkMatch[1].trim() : "#";
-
-        let timeStr = "";
+        const mp = mpMatch ? mpMatch[1].trim() : '';
+        const category = categoryMatch ? categoryMatch[1].trim() : '';
+        const summary = summaryMatch ? summaryMatch[1].trim() : '';
+        const link = linkMatch ? linkMatch[1].trim() : '#';
+        
+        let timeStr = '';
         if (timeMatch) {
             const t = timeMatch[1].trim();
-            const parts = t.split(" ");
-            if (parts.length === 2 && parts[0].indexOf("/") !== -1) {
-                const dateParts = parts[0].split("/");
-                timeStr = dateParts[1] + "-" + dateParts[2] + " " + parts[1];
+            const parts = t.split(' ');
+            if (parts.length === 2 && parts[0].includes('/')) {
+                const dateParts = parts[0].split('/');
+                timeStr = `${dateParts[1]}-${dateParts[2]} ${parts[1]}`;
             } else {
                 timeStr = t;
             }
         }
 
-        let tagClass = "hangye";
-        if (category === "出海") tagClass = "chuhai";
-        else if (category === "AI技术") tagClass = "ai";
-        else if (category === "小游戏") tagClass = "xiaoyouxi";
+        let tagClass = 'hangye';
+        if (category === '出海') tagClass = 'chuhai';
+        else if (category === 'AI技术') tagClass = 'ai';
+        else if (category === '小游戏') tagClass = 'xiaoyouxi';
 
-        let summaryHtml = "";
-        if (summary && summary !== "暂无摘要") {
-            summaryHtml = '<div class="summary">' + summary + '</div>';
-        }
-
-        let featuredHtml = isFeatured ? '<span class="tag featured-tag">⭐ 重点</span>' : '';
-        let categoryHtml = category ? '<span class="tag ' + tagClass + '">' + category + '</span>' : '';
-        let mpHtml = mp ? '<span class="source">' + mp + '</span>' : '';
-        let cardClass = isFeatured ? 'card featured' : 'card';
-
-        cardsHtml += '<div class="' + cardClass + '">\n';
-        cardsHtml += '    <h2 class="title"><a href="' + link + '" target="_blank">' + cleanTitle + '</a></h2>\n';
-        cardsHtml += '    ' + summaryHtml + '\n';
-        cardsHtml += '    <div class="meta">\n';
-        cardsHtml += '        ' + featuredHtml + '\n';
-        cardsHtml += '        ' + categoryHtml + '\n';
-        cardsHtml += '        ' + mpHtml + '\n';
-        cardsHtml += '        <span class="time">' + timeStr + '</span>\n';
-        cardsHtml += '    </div>\n';
-        cardsHtml += '</div>\n';
+        // 拼接卡片 HTML
+        cardsHtml += `
+            <div class="card ${isFeatured ? 'featured' : ''}">
+                <h2 class="title"><a href="${link}" target="_blank">${cleanTitle}</a></h2>
+                ${summary && summary !== '暂无摘要' ? `<div class="summary">${summary}</div>` : ''}
+                <div class="meta">
+                    ${isFeatured ? '<span class="tag featured-tag">⭐ 重点</span>' : ''}
+                    ${category ? `<span class="tag ${tagClass}">${category}</span>` : ''}
+                    ${mp ? `<span class="source">${mp}</span>` : ''}
+                    <span class="time">${timeStr}</span>
+                </div>
+            </div>\n`;
     });
 
-    const htmlFileName = dateKey + ".html";
+    // 4. 替换模板变量 (兼容所有空格格式)
+    const htmlFileName = `${dateKey}.html`;
+    let pageHtml = articleTemplate
+        .replace(/\{\{DATE\}\}/g, reportDate)
+        .replace(/\{\{COUNT\}\}/g, reportCount);
 
-    let pageHtml = articleTemplate;
-    pageHtml = pageHtml.replace(/\{\{DATE\}\}/g, reportDate);
-    pageHtml = pageHtml.replace(/\{\{COUNT\}\}/g, reportCount);
-    pageHtml = pageHtml.replace(//, function() { return cardsHtml; });
-
+    // 采用原生 split+join 替换文章内容，100% 不会因为特殊字符报错
+    if (pageHtml.includes('')) {
+        pageHtml = pageHtml.split('').join(cardsHtml);
+    } else if (pageHtml.includes('')) {
+        pageHtml = pageHtml.split('').join(cardsHtml);
+    } else {
+        pageHtml = pageHtml.replace(//, () => cardsHtml);
+    }
+    
     fs.writeFileSync(htmlFileName, pageHtml);
-    console.log("Success: " + htmlFileName);
+    console.log(`✅ 成功生成页面: ${htmlFileName}`);
 
-    historyListHtml += '<a href="' + htmlFileName + '" class="history-item">\n';
-    historyListHtml += '    <div class="history-date">' + dateKey + '</div>\n';
-    historyListHtml += '    <div class="history-info">\n';
-    historyListHtml += '        <span class="history-title">' + reportDate + '日报</span>\n';
-    historyListHtml += '        <span class="history-count">共 ' + reportCount + ' 篇</span>\n';
-    historyListHtml += '    </div>\n';
-    historyListHtml += '    <div class="history-arrow">→</div>\n';
-    historyListHtml += '</a>\n';
+    // 收集主页历史记录
+    historyListHtml += `
+        <a href="${htmlFileName}" class="history-item">
+            <div class="history-date">${dateKey}</div>
+            <div class="history-info">
+                <span class="history-title">${reportDate}日报</span>
+                <span class="history-count">共 ${reportCount} 篇</span>
+            </div>
+            <div class="history-arrow">→</div>
+        </a>\n`;
 });
 
+// 5. 生成主页 index.html
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
-indexTpl = indexTpl.replace(//, function() { return historyListHtml; });
-fs.writeFileSync('index.html', indexTpl);
 
-console.log("All done!");
+if (indexTpl.includes('')) {
+    indexTpl = indexTpl.split('').join(historyListHtml);
+} else if (indexTpl.includes('')) {
+    indexTpl = indexTpl.split('').join(historyListHtml);
+} else {
+    indexTpl = indexTpl.replace(//, () => historyListHtml);
+}
+
+fs.writeFileSync('index.html', indexTpl);
+console.log('🎉 所有页面编译打包完成！');
