@@ -3,39 +3,40 @@ const path = require('path');
 
 const dataDir = path.join(__dirname, 'data');
 
-// 1. 检查并初始化目录
+// 首次运行如果没 data 文件夹则创建
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
-    console.log('初始化 data 目录完成');
+    console.log('创建了空的 data 目录。');
     process.exit(0);
 }
 
-// 2. 读取所有 txt 文件
-const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort().reverse();
+// 获取所有 txt 文件，按文件名（日期）倒序排列，最新的一天在最前面
+const files = fs.readdirSync(dataDir)
+                .filter(f => f.endsWith('.txt'))
+                .sort().reverse();
+
 if (files.length === 0) {
-    console.log('未找到任何数据文件');
+    console.log('没有找到任何数据文件');
     process.exit(0);
 }
 
 let historyListHtml = '';
 const articleTemplate = fs.readFileSync('template.html', 'utf-8');
 
-// 3. 遍历生成每一天的日报
 files.forEach(file => {
     const rawText = fs.readFileSync(path.join(dataDir, file), 'utf-8');
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
     if (lines.length === 0) return;
 
+    // 获取文件名作为日期路由，如 '2026-05-06'
     const dateKey = file.replace('.txt', ''); 
+
     const headerLine = lines[0];
-    
-    // 解析标题和数量
     const dateMatch = headerLine.match(/(.*?)游戏圈日报/);
     const countMatch = headerLine.match(/共\s*(\d+)\s*篇/);
     const reportDate = dateMatch ? dateMatch[1] : dateKey;
     const reportCount = countMatch ? countMatch[1] : '0';
 
-    // 解析文章区块
     const contentText = rawText.substring(rawText.indexOf('\n')).trim();
     const rawBlocks = contentText.split(/(?=\n\d+\.\s)/).map(b => b.trim()).filter(b => b);
 
@@ -74,7 +75,6 @@ files.forEach(file => {
         else if (category === 'AI技术') tagClass = 'ai';
         else if (category === '小游戏') tagClass = 'xiaoyouxi';
 
-        // 拼接卡片 HTML
         cardsHtml += `
             <div class="card ${isFeatured ? 'featured' : ''}">
                 <h2 class="title"><a href="${link}" target="_blank">${cleanTitle}</a></h2>
@@ -88,25 +88,16 @@ files.forEach(file => {
             </div>\n`;
     });
 
-    // 4. 替换模板变量 (兼容所有空格格式)
+    // 为当前日期生成专属的 HTML 页面
     const htmlFileName = `${dateKey}.html`;
     let pageHtml = articleTemplate
         .replace(/\{\{DATE\}\}/g, reportDate)
-        .replace(/\{\{COUNT\}\}/g, reportCount);
-
-    // 采用原生 split+join 替换文章内容，100% 不会因为特殊字符报错
-    if (pageHtml.includes('')) {
-        pageHtml = pageHtml.split('').join(cardsHtml);
-    } else if (pageHtml.includes('')) {
-        pageHtml = pageHtml.split('').join(cardsHtml);
-    } else {
-        pageHtml = pageHtml.replace(//, () => cardsHtml);
-    }
+        .replace(/\{\{COUNT\}\}/g, reportCount)
+        .replace('<!-- CARDS_CONTENT_HERE -->', cardsHtml);
     
     fs.writeFileSync(htmlFileName, pageHtml);
-    console.log(`✅ 成功生成页面: ${htmlFileName}`);
 
-    // 收集主页历史记录
+    // 累加历史记录列表，为首页做准备
     historyListHtml += `
         <a href="${htmlFileName}" class="history-item">
             <div class="history-date">${dateKey}</div>
@@ -118,16 +109,9 @@ files.forEach(file => {
         </a>\n`;
 });
 
-// 5. 生成主页 index.html
+// 读取首页模板，注入历史记录，生成最终的 index.html
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
-
-if (indexTpl.includes('')) {
-    indexTpl = indexTpl.split('').join(historyListHtml);
-} else if (indexTpl.includes('')) {
-    indexTpl = indexTpl.split('').join(historyListHtml);
-} else {
-    indexTpl = indexTpl.replace(//, () => historyListHtml);
-}
-
+indexTpl = indexTpl.replace('<!-- HISTORY_LIST_HERE -->', historyListHtml);
 fs.writeFileSync('index.html', indexTpl);
-console.log('🎉 所有页面编译打包完成！');
+
+console.log('所有静态页面生成完毕！');

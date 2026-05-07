@@ -4,15 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{{DATE}}游戏圈日报——超哥版</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --bg-color: #f0f2f5; --text-main: #1a1a1a; --text-light: #5c6b77; --text-meta: #909399; --card-bg: #ffffff; --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff; --tag-ai: #f6ffed; --tag-ai-text: #52c41a; --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96; --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16; --tag-featured: #fffbe6; --tag-featured-text: #faad14; }
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
         .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        /* 顶部导航栏 */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .back-link { display: inline-block; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
         
+        /* 截图按钮 */
+        .screenshot-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            color: #1890ff;
+            border: 1.5px solid #1890ff;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .screenshot-btn:active { background: #e6f7ff; transform: scale(0.96); }
+        .screenshot-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .screenshot-btn.loading { opacity: 0.6; pointer-events: none; }
+
         .header { padding: 0 10px 16px; text-align: left; }
         .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
@@ -34,110 +62,201 @@
         .source { font-weight: 500; margin-right: 8px; color: #8c8c8c; }
         .time { margin-left: auto; color: #bfbfbf; font-family: monospace; font-size: 10px; }
 
-        /* 新增：弹窗组件样式 */
-        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .modal.show { opacity: 1; pointer-events: auto; }
-        .modal-header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; color: #fff; }
-        .modal-hint { font-size: 14px; font-weight: 500; color: #e6f7ff; }
-        .btn-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 15px; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .preview-container { flex: 1; width: 100%; max-width: 400px; padding: 0 20px 40px; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; align-items: flex-start; }
-        .preview-container img { width: 100%; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+        /* 图片预览遮罩 */
+        .preview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .preview-overlay.active { display: flex; }
+
+        .preview-toolbar {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .preview-hint {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+        .preview-close {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        .preview-close:active { background: rgba(255,255,255,0.25); }
+
+        .preview-img-wrap {
+            width: 100%;
+            max-width: 800px;
+        }
+        .preview-img-wrap img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .preview-save-btn {
+            margin-top: 16px;
+            background: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 36px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            flex-shrink: 0;
+        }
+        .preview-save-btn:active { background: #096dd9; }
+
+        /* 截图时专用样式：隐藏顶部导航 */
+        .screenshot-capture-target {
+            background: var(--bg-color);
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
+    <!-- 顶部导航：返回 + 截图按钮 -->
+    <div class="top-nav" id="topNav">
         <a href="index.html" class="back-link">← 返回历史记录</a>
-        <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
-        <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
+        <button class="screenshot-btn" id="screenshotBtn" onclick="takeScreenshot()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+            </svg>
+            生成图片
+        </button>
     </div>
-    <div class="article-list">
-</div>
+
+    <!-- 日报主体内容（截图目标区域） -->
+    <div id="captureTarget">
+        <div class="header">
+            <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
+            <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
+        </div>
+        <div class="article-list">
+<!-- CARDS_CONTENT_HERE -->
+        </div>
+    </div>
 </div>
 
-<div id="image-modal" class="modal">
-    <div class="modal-header">
-        <span class="modal-hint">👇 长按下方图片保存或分享</span>
-        <button id="btn-close" class="btn-close">×</button>
+<!-- 图片预览层 -->
+<div class="preview-overlay" id="previewOverlay">
+    <div class="preview-toolbar">
+        <span class="preview-hint" id="previewHint">长按图片保存到相册</span>
+        <button class="preview-close" onclick="closePreview()">关闭</button>
     </div>
-    <div class="preview-container" id="preview-container"></div>
+    <div class="preview-img-wrap" id="previewImgWrap"></div>
+    <button class="preview-save-btn" id="downloadBtn" style="display:none;" onclick="downloadImage()">⬇ 下载图片</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-// 使用纯 JS 动态注入交互，100% 保护你的原始 HTML DOM 结构不被破坏
-document.addEventListener("DOMContentLoaded", function() {
-    const header = document.querySelector('.header');
-    const backLink = document.querySelector('.back-link');
-    const container = document.querySelector('.container');
+    // 检测是否为移动端
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // 1. 动态构建顶部工具栏（不会影响 build.js 的静态解析）
-    const topRow = document.createElement('div');
-    topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
-    // 关键属性：截图时自动忽略这行工具栏
-    topRow.setAttribute('data-html2canvas-ignore', 'true'); 
+    async function takeScreenshot() {
+        const btn = document.getElementById('screenshotBtn');
+        const target = document.getElementById('captureTarget');
 
-    const btnGenerate = document.createElement('button');
-    btnGenerate.innerHTML = '📸 生成分享图';
-    btnGenerate.style.cssText = 'background: #1890ff; color: #fff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(24,144,255,0.2); display: flex; align-items: center;';
-    
-    // 组装顶部按钮
-    backLink.style.marginBottom = '0';
-    header.insertBefore(topRow, header.firstChild);
-    topRow.appendChild(backLink);
-    topRow.appendChild(btnGenerate);
+        btn.classList.add('loading');
+        btn.textContent = '生成中…';
 
-    // 2. 绑定截图与弹窗逻辑
-    const modal = document.getElementById('image-modal');
-    const btnClose = document.getElementById('btn-close');
-    const previewContainer = document.getElementById('preview-container');
+        // 截图前：让卡片链接的伪元素不遮挡，暂时不影响布局
+        try {
+            const canvas = await html2canvas(target, {
+                scale: window.devicePixelRatio * 1.5,  // 高清截图
+                useCORS: true,
+                backgroundColor: '#f0f2f5',
+                logging: false,
+                // 忽略顶部导航栏，只截 captureTarget
+                ignoreElements: (el) => el.id === 'topNav'
+            });
 
-    btnGenerate.addEventListener('click', function() {
-        const originalText = btnGenerate.innerHTML;
-        btnGenerate.innerHTML = '⏳ 生成中...';
-        btnGenerate.disabled = true;
-        btnGenerate.style.background = '#91caff';
+            showPreview(canvas);
+        } catch (err) {
+            console.error('截图失败', err);
+            alert('截图失败，请重试');
+        } finally {
+            btn.classList.remove('loading');
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>生成图片`;
+        }
+    }
 
-        // 临时锁定背景色，防止长图透明底发黑
-        const originalBg = container.style.backgroundColor;
-        container.style.backgroundColor = '#f0f2f5';
-        container.style.borderRadius = '8px';
+    let _currentDataUrl = null;
 
-        html2canvas(container, {
-            scale: window.devicePixelRatio || 2, 
-            useCORS: true,
-            backgroundColor: '#f0f2f5'
-        }).then(canvas => {
-            container.style.backgroundColor = originalBg; // 截图完恢复原样
-            
-            const imgData = canvas.toDataURL('image/png');
-            const img = document.createElement('img');
-            img.src = imgData;
-            previewContainer.innerHTML = '';
-            previewContainer.appendChild(img);
+    function showPreview(canvas) {
+        _currentDataUrl = canvas.toDataURL('image/png');
 
-            modal.classList.add('show');
-            
-            // 恢复按钮状态
-            btnGenerate.innerHTML = originalText;
-            btnGenerate.disabled = false;
-            btnGenerate.style.background = '#1890ff';
-        }).catch(err => {
-            container.style.backgroundColor = originalBg;
-            console.error('图片生成失败:', err);
-            alert('图片生成失败，请重试');
-            btnGenerate.innerHTML = originalText;
-            btnGenerate.disabled = false;
-            btnGenerate.style.background = '#1890ff';
-        });
+        const wrap = document.getElementById('previewImgWrap');
+        wrap.innerHTML = '';
+
+        const img = document.createElement('img');
+        img.src = _currentDataUrl;
+        img.alt = '日报截图';
+        wrap.appendChild(img);
+
+        // 移动端提示长按保存，桌面端显示下载按钮
+        const hint = document.getElementById('previewHint');
+        const dlBtn = document.getElementById('downloadBtn');
+        if (isMobile) {
+            hint.textContent = '长按图片保存到相册';
+            dlBtn.style.display = 'none';
+        } else {
+            hint.textContent = '右键图片另存为，或点击下方按钮下载';
+            dlBtn.style.display = 'inline-block';
+        }
+
+        document.getElementById('previewOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+        document.getElementById('previewOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function downloadImage() {
+        if (!_currentDataUrl) return;
+        // 从页面标题提取日期，用作文件名
+        const dateText = document.querySelector('.header h1')?.textContent || '日报';
+        const match = dateText.match(/(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
+        const filename = match ? `游戏圈日报_${match[1]}.png` : '游戏圈日报.png';
+
+        const a = document.createElement('a');
+        a.href = _currentDataUrl;
+        a.download = filename;
+        a.click();
+    }
+
+    // 点击遮罩空白区域关闭
+    document.getElementById('previewOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closePreview();
     });
-
-    // 弹窗关闭逻辑
-    btnClose.addEventListener('click', function() { modal.classList.remove('show'); });
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal || e.target === previewContainer) { modal.classList.remove('show'); }
-    });
-});
 </script>
+
 </body>
 </html>
