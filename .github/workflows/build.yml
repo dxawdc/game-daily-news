@@ -3,10 +3,10 @@ name: Generate and Deploy Daily Report
 on:
   push:
     paths:
+      - 'data/**'
       - 'data.txt'
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
-# 设置权限，允许 Actions 部署 Pages
 permissions:
   contents: read
   pages: write
@@ -37,7 +37,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # 上传整个目录作为制品
+          path: '.' 
 
       - name: Deploy to GitHub Pages
         id: deployment
