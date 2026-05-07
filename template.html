@@ -11,21 +11,15 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
         .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        /* 新增：顶部操作栏样式 */
-        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .back-link { color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
         
-        /* 新增：截图按钮样式 */
-        .btn-screenshot {
-            background-color: #1890ff; color: #fff; border: none; padding: 6px 14px; 
-            border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer;
-            box-shadow: 0 2px 6px rgba(24,144,255,0.2); transition: all 0.2s;
-        }
+        /* 新增：截图按钮样式，使用 float 避免破坏原有 DOM 结构 */
+        .btn-screenshot { float: right; background-color: #1890ff; color: #fff; border: none; padding: 6px 14px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(24,144,255,0.2); transition: all 0.2s; }
         .btn-screenshot:active { background-color: #096dd9; transform: scale(0.96); }
         .btn-screenshot:disabled { background-color: #91caff; cursor: not-allowed; }
 
         .header { padding: 0 10px 16px; text-align: left; }
-        .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; clear: both; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
         .article-list { display: flex; flex-direction: column; gap: 8px; }
         .card { background: var(--card-bg); border-radius: 8px; padding: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
@@ -48,12 +42,10 @@
 </head>
 <body>
 
-<div class="container" id="report-container">
+<div class="container">
     <div class="header">
-        <div class="action-bar" data-html2canvas-ignore="true">
-            <a href="index.html" class="back-link">← 返回历史记录</a>
-            <button class="btn-screenshot" id="captureBtn" onclick="generateScreenshot()">📸 生成长图分享</button>
-        </div>
+        <a href="index.html" class="back-link" data-html2canvas-ignore="true">← 返回历史记录</a>
+        <button class="btn-screenshot" id="captureBtn" onclick="generateScreenshot()" data-html2canvas-ignore="true">📸 生成长图分享</button>
         <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
         <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
     </div>
@@ -68,24 +60,20 @@
         btn.innerHTML = '⏳ 生成中...';
         btn.disabled = true;
 
-        const target = document.getElementById('report-container');
+        // 改为直接选中原有的 container，不依赖新增 id
+        const target = document.querySelector('.container');
 
-        // 使用 html2canvas 生成截图
         html2canvas(target, {
-            scale: 2, // 提高分辨率，让移动端截图更清晰
-            useCORS: true, // 允许跨域图片加载
-            backgroundColor: '#f0f2f5' // 保持和 body 背景色一致
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#f0f2f5' 
         }).then(canvas => {
-            // 将 canvas 转换为图片数据
             const imgData = canvas.toDataURL('image/png');
-            
-            // 创建一个隐藏的 a 标签触发下载
             const link = document.createElement('a');
-            link.download = `游戏圈日报_{{DATE}}.png`; // 默认下载文件名
+            link.download = `游戏圈日报_{{DATE}}.png`; 
             link.href = imgData;
             link.click();
 
-            // 恢复按钮状态
             btn.innerHTML = originalText;
             btn.disabled = false;
         }).catch(err => {
