@@ -3,7 +3,7 @@ const path = require('path');
 
 const dataDir = path.join(__dirname, 'data');
 
-// 容错处理：确保目录存在
+// 确保目录存在
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
     console.log('Waiting for data files...');
@@ -11,7 +11,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort().reverse();
-if (files.length === 0) { console.log('No data found.'); process.exit(0); }
+if (files.length === 0) { console.log('No data found in data/ folder.'); process.exit(0); }
 
 let historyListHtml = '';
 const articleTemplate = fs.readFileSync('template.html', 'utf-8');
@@ -41,7 +41,6 @@ files.forEach(file => {
         const summary = (block.match(/摘要：(.*?)(?=\n|$)/) || ['', ''])[1].trim();
         const link = (block.match(/原文链接：(.*?)(?=\n|$)/) || ['', '#'])[1].trim();
         const timeMatch = block.match(/发布时间：(.*?)(?=\n|$)/);
-        
         let timeStr = timeMatch ? timeMatch[1].trim().split(' ').pop() : '';
 
         cardsHtml += `
@@ -54,15 +53,20 @@ files.forEach(file => {
                     <span class="source">${mp}</span>
                     <span class="time">${timeStr}</span>
                 </div>
-            </div>`;
+            </div>\n`;
     });
 
     const htmlFileName = `${dateKey}.html`;
-    // 关键修正：确保替换逻辑对空格不敏感
-    const pageHtml = articleTemplate
+    let pageHtml = articleTemplate
         .replace(/\{\{DATE\}\}/g, reportDate)
-        .replace(/\{\{COUNT\}\}/g, reportCount)
-        .replace(//, cardsHtml);
+        .replace(/\{\{COUNT\}\}/g, reportCount);
+
+    // 双重保险替换逻辑
+    if (//.test(pageHtml)) {
+        pageHtml = pageHtml.replace(//, cardsHtml);
+    } else {
+        pageHtml = pageHtml.replace('<div class="article-list">', '<div class="article-list">\n' + cardsHtml);
+    }
     
     fs.writeFileSync(htmlFileName, pageHtml);
 
@@ -74,9 +78,14 @@ files.forEach(file => {
                 <span class="history-count">共 ${reportCount} 篇</span>
             </div>
             <div class="history-arrow">→</div>
-        </a>`;
+        </a>\n`;
 });
 
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
-indexTpl = indexTpl.replace(//, historyListHtml);
+if (//.test(indexTpl)) {
+    indexTpl = indexTpl.replace(//, historyListHtml);
+} else {
+    indexTpl = indexTpl.replace('<div class="history-list">', '<div class="history-list">\n' + historyListHtml);
+}
 fs.writeFileSync('index.html', indexTpl);
+console.log('Build Success!');
