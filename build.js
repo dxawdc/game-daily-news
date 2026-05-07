@@ -90,12 +90,17 @@ files.forEach(file => {
 
     // 为当前日期生成专属的 HTML 页面
     const htmlFileName = `${dateKey}.html`;
+    
+    // 【关键修复点】：使用正则匹配容错空格，并使用回调函数注入 cardsHtml 防止 $ 符崩溃
     let pageHtml = articleTemplate
         .replace(/\{\{DATE\}\}/g, reportDate)
         .replace(/\{\{COUNT\}\}/g, reportCount)
-        .replace('<!-- CARDS_CONTENT_HERE -->', cardsHtml);
+        .replace(//, () => cardsHtml);
     
     fs.writeFileSync(htmlFileName, pageHtml);
+    
+    // 增加调试输出，方便你在 GitHub Actions 日志里确认是否解析成功
+    console.log(`[成功] 生成文件 ${htmlFileName}，写入文章 ${rawBlocks.length} 篇。`);
 
     // 累加历史记录列表，为首页做准备
     historyListHtml += `
@@ -111,7 +116,10 @@ files.forEach(file => {
 
 // 读取首页模板，注入历史记录，生成最终的 index.html
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
-indexTpl = indexTpl.replace('<!-- HISTORY_LIST_HERE -->', historyListHtml);
+
+// 【同步加固】：主页的替换逻辑也同步做了防崩溃处理
+indexTpl = indexTpl.replace(//, () => historyListHtml);
+
 fs.writeFileSync('index.html', indexTpl);
 
 console.log('所有静态页面生成完毕！');
