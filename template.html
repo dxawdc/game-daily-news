@@ -4,32 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{{DATE}}游戏圈日报——超哥版</title>
-    
-    <meta property="og:title" content="{{DATE}}游戏圈日报——超哥版">
-    <meta property="og:description" content="共收录 {{COUNT}} 篇昨日头条 · 点击查看完整日报">
-    <meta property="og:url" content="https://dailynews.skinsdata.top/index">
-    <meta property="og:type" content="article">
-    
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
     <style>
+        /* 这里保留之前的 CSS 样式，完全相同... 为了篇幅省略，请复制你之前的 style 内容 */
         :root { --bg-color: #f0f2f5; --text-main: #1a1a1a; --text-light: #5c6b77; --text-meta: #909399; --card-bg: #ffffff; --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff; --tag-ai: #f6ffed; --tag-ai-text: #52c41a; --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96; --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16; --tag-featured: #fffbe6; --tag-featured-text: #faad14; }
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
         .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        /* 顶部导航和按钮区域 */
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .back-link { color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
-        .btn-poster { background: #1890ff; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-        .btn-poster:active { background: #096dd9; }
-        .btn-poster:disabled { background: #91caff; cursor: not-allowed; }
-
+        /* 新增：返回按钮样式 */
+        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        
         .header { padding: 0 10px 16px; text-align: left; }
         .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
         .article-list { display: flex; flex-direction: column; gap: 8px; }
-        
         .card { background: var(--card-bg); border-radius: 8px; padding: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
         .card:active { background-color: #f9fafc; }
         .card.featured { background: #fffefa; border: 1px solid #faedcd; }
@@ -50,94 +38,16 @@
 </head>
 <body>
 
-<div class="container" id="capture-area">
-    <div class="top-nav" id="hide-in-poster">
-        <a href="index.html" class="back-link">← 返回历史</a>
-        <button id="posterBtn" class="btn-poster" onclick="generatePoster()">生成长图海报</button>
-    </div>
-    
+<div class="container">
     <div class="header">
+        <a href="index.html" class="back-link">← 返回历史记录</a>
         <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
         <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
     </div>
     <div class="article-list">
-        </div>
+<!-- CARDS_CONTENT_HERE -->
+    </div>
 </div>
-
-<script>
-    function generatePoster() {
-        const btn = document.getElementById('posterBtn');
-        const hideArea = document.getElementById('hide-in-poster');
-        const container = document.getElementById('capture-area');
-        
-        // 按钮状态变为生成中
-        const originalText = btn.innerText;
-        btn.innerText = '正在生成...';
-        btn.disabled = true;
-
-        // 生成截图前，临时隐藏顶部的返回和分享按钮，让海报更干净
-        hideArea.style.display = 'none';
-
-        html2canvas(container, {
-            scale: window.devicePixelRatio || 2, // 确保视网膜屏幕下的高清画质
-            useCORS: true,
-            backgroundColor: '#f0f2f5' // 填充背景色，防止透明
-        }).then(canvas => {
-            // 截图完成，恢复原有的按钮显示
-            hideArea.style.display = 'flex';
-            btn.innerText = originalText;
-            btn.disabled = false;
-
-            const imgData = canvas.toDataURL('image/png');
-
-            // --- 创建带有黑色半透明遮罩的弹窗 ---
-            const overlay = document.createElement('div');
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0'; overlay.style.left = '0';
-            overlay.style.width = '100%'; overlay.style.height = '100%';
-            overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
-            overlay.style.zIndex = '9999';
-            overlay.style.display = 'flex';
-            overlay.style.flexDirection = 'column';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-
-            // 提示文字
-            const tip = document.createElement('div');
-            tip.innerText = '🎉 生成成功！请长按下方图片保存至相册，点击空白处关闭。';
-            tip.style.color = '#fff';
-            tip.style.padding = '15px';
-            tip.style.fontSize = '14px';
-            tip.style.textAlign = 'center';
-
-            // 海报图片展示
-            const img = new Image();
-            img.src = imgData;
-            img.style.maxWidth = '90%';
-            img.style.maxHeight = '80%';
-            img.style.objectFit = 'contain';
-            img.style.borderRadius = '8px';
-            img.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
-
-            // 组装并弹窗
-            overlay.appendChild(tip);
-            overlay.appendChild(img);
-            document.body.appendChild(overlay);
-
-            // 点击遮罩空白处关闭海报
-            overlay.onclick = () => document.body.removeChild(overlay);
-            // 防止点击图片本身时被误关
-            img.onclick = (e) => e.stopPropagation(); 
-
-        }).catch(err => {
-            console.error('海报生成失败:', err);
-            hideArea.style.display = 'flex';
-            btn.innerText = '生成失败';
-            btn.disabled = false;
-            alert('海报生成失败，请刷新页面重试。');
-        });
-    }
-</script>
 
 </body>
 </html>
