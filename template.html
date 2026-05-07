@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{{DATE}}游戏圈日报——超哥版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* 这里保留之前的 CSS 样式，完全相同... 为了篇幅省略，请复制你之前的 style 内容 */
         :root { --bg-color: #f0f2f5; --text-main: #1a1a1a; --text-light: #5c6b77; --text-meta: #909399; --card-bg: #ffffff; --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff; --tag-ai: #f6ffed; --tag-ai-text: #52c41a; --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96; --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16; --tag-featured: #fffbe6; --tag-featured-text: #faad14; }
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
         .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        /* 新增：返回按钮样式 */
-        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        /* 新增：顶部操作栏样式 */
+        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .back-link { color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
         
+        /* 新增：截图按钮样式 */
+        .btn-screenshot {
+            background-color: #1890ff; color: #fff; border: none; padding: 6px 14px; 
+            border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer;
+            box-shadow: 0 2px 6px rgba(24,144,255,0.2); transition: all 0.2s;
+        }
+        .btn-screenshot:active { background-color: #096dd9; transform: scale(0.96); }
+        .btn-screenshot:disabled { background-color: #91caff; cursor: not-allowed; }
+
         .header { padding: 0 10px 16px; text-align: left; }
         .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
@@ -38,16 +48,54 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="report-container">
     <div class="header">
-        <a href="index.html" class="back-link">← 返回历史记录</a>
+        <div class="action-bar" data-html2canvas-ignore="true">
+            <a href="index.html" class="back-link">← 返回历史记录</a>
+            <button class="btn-screenshot" id="captureBtn" onclick="generateScreenshot()">📸 生成长图分享</button>
+        </div>
         <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
         <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
     </div>
     <div class="article-list">
-<!-- CARDS_CONTENT_HERE -->
-    </div>
 </div>
+</div>
+
+<script>
+    function generateScreenshot() {
+        const btn = document.getElementById('captureBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ 生成中...';
+        btn.disabled = true;
+
+        const target = document.getElementById('report-container');
+
+        // 使用 html2canvas 生成截图
+        html2canvas(target, {
+            scale: 2, // 提高分辨率，让移动端截图更清晰
+            useCORS: true, // 允许跨域图片加载
+            backgroundColor: '#f0f2f5' // 保持和 body 背景色一致
+        }).then(canvas => {
+            // 将 canvas 转换为图片数据
+            const imgData = canvas.toDataURL('image/png');
+            
+            // 创建一个隐藏的 a 标签触发下载
+            const link = document.createElement('a');
+            link.download = `游戏圈日报_{{DATE}}.png`; // 默认下载文件名
+            link.href = imgData;
+            link.click();
+
+            // 恢复按钮状态
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('截图失败:', err);
+            alert('生成长图失败，请稍后重试');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+</script>
 
 </body>
 </html>
