@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>{{DATE}}游戏圈日报——超哥版</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --text-main: #1a1a1a;
+            --text-light: #5c6b77;
+            --text-meta: #909399;
+            --card-bg: #ffffff;
+            --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff;
+            --tag-ai: #f6ffed; --tag-ai-text: #52c41a;
+            --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96;
+            --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16;
+            --tag-featured: #fffbe6; --tag-featured-text: #faad14;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 10px; }
+        .header { padding: 12px 10px 16px; text-align: left; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+        .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
+        .article-list { display: flex; flex-direction: column; gap: 8px; }
+        
+        .card { background: var(--card-bg); border-radius: 8px; padding: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+        .card:active { background-color: #f9fafc; }
+        .card.featured { background: #fffefa; border: 1px solid #faedcd; }
+        
+        .title { margin: 0 0 6px 0; font-size: 16px; line-height: 1.45; font-weight: 500; }
+        .title a { color: var(--text-main); text-decoration: none; }
+        .title a::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 1; }
+        
+        .summary { font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .meta { display: flex; align-items: center; font-size: 11px; color: var(--text-meta); line-height: 1; }
+        .tag { padding: 2px 6px; border-radius: 4px; margin-right: 8px; font-weight: 500; white-space: nowrap; }
+        .tag.featured-tag { background: var(--tag-featured); color: var(--tag-featured-text); border: 1px solid #ffe58f;}
+        .tag.chuhai { background: var(--tag-chuhai); color: var(--tag-chuhai-text); }
+        .tag.ai { background: var(--tag-ai); color: var(--tag-ai-text); }
+        .tag.hangye { background: var(--tag-hangye); color: var(--tag-hangye-text); }
+        .tag.xiaoyouxi { background: var(--tag-xiaoyouxi); color: var(--tag-xiaoyouxi-text); }
+        .source { font-weight: 500; margin-right: 8px; color: #8c8c8c; }
+        .time { margin-left: auto; color: #bfbfbf; font-family: monospace; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
+        <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
+    </div>
+    <div class="article-list">
+<!-- CARDS_CONTENT_HERE -->
+    </div>
+</div>
+
+</body>
+</html>
