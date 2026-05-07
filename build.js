@@ -10,7 +10,7 @@ if (!fs.existsSync(dataDir)) {
     process.exit(0);
 }
 
-// 获取所有 txt 文件，按文件名（日期）倒序排列，最新的一天在最前面
+// 获取所有 txt 文件，按文件名（日期）倒序排列
 const files = fs.readdirSync(dataDir)
                 .filter(f => f.endsWith('.txt'))
                 .sort().reverse();
@@ -28,7 +28,6 @@ files.forEach(file => {
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
     if (lines.length === 0) return;
 
-    // 获取文件名作为日期路由，如 '2026-05-06'
     const dateKey = file.replace('.txt', ''); 
 
     const headerLine = lines[0];
@@ -75,34 +74,42 @@ files.forEach(file => {
         else if (category === 'AI技术') tagClass = 'ai';
         else if (category === '小游戏') tagClass = 'xiaoyouxi';
 
+        // 将复杂的条件判断抽离，避免模板嵌套报错
+        let summaryHtml = '';
+        if (summary && summary !== '暂无摘要') {
+            summaryHtml = '<div class="summary">' + summary + '</div>';
+        }
+        
+        let featuredHtml = isFeatured ? '<span class="tag featured-tag">⭐ 重点</span>' : '';
+        let categoryHtml = category ? '<span class="tag ' + tagClass + '">' + category + '</span>' : '';
+        let mpHtml = mp ? '<span class="source">' + mp + '</span>' : '';
+        let cardClass = isFeatured ? 'card featured' : 'card';
+
         cardsHtml += `
-            <div class="card ${isFeatured ? 'featured' : ''}">
+            <div class="${cardClass}">
                 <h2 class="title"><a href="${link}" target="_blank">${cleanTitle}</a></h2>
-                ${summary && summary !== '暂无摘要' ? `<div class="summary">${summary}</div>` : ''}
+                ${summaryHtml}
                 <div class="meta">
-                    ${isFeatured ? '<span class="tag featured-tag">⭐ 重点</span>' : ''}
-                    ${category ? `<span class="tag ${tagClass}">${category}</span>` : ''}
-                    ${mp ? `<span class="source">${mp}</span>` : ''}
+                    ${featuredHtml}
+                    ${categoryHtml}
+                    ${mpHtml}
                     <span class="time">${timeStr}</span>
                 </div>
             </div>\n`;
     });
 
-    // 为当前日期生成专属的 HTML 页面
     const htmlFileName = `${dateKey}.html`;
     
-    // 【关键修复点】：使用正则匹配容错空格，并使用回调函数注入 cardsHtml 防止 $ 符崩溃
-    let pageHtml = articleTemplate
-        .replace(/\{\{DATE\}\}/g, reportDate)
-        .replace(/\{\{COUNT\}\}/g, reportCount)
-        .replace(//, () => cardsHtml);
+    // 采用逐行赋值替换，杜绝链式调用导致的括号丢失风险
+    let pageHtml = articleTemplate;
+    pageHtml = pageHtml.replace(/\{\{DATE\}\}/g, reportDate);
+    pageHtml = pageHtml.replace(/\{\{COUNT\}\}/g, reportCount);
+    pageHtml = pageHtml.replace(//, function() { return cardsHtml; });
     
     fs.writeFileSync(htmlFileName, pageHtml);
     
-    // 增加调试输出，方便你在 GitHub Actions 日志里确认是否解析成功
-    console.log(`[成功] 生成文件 ${htmlFileName}，写入文章 ${rawBlocks.length} 篇。`);
+    console.log('[成功] 生成文件 ' + htmlFileName + '，写入文章 ' + rawBlocks.length + ' 篇。');
 
-    // 累加历史记录列表，为首页做准备
     historyListHtml += `
         <a href="${htmlFileName}" class="history-item">
             <div class="history-date">${dateKey}</div>
@@ -114,12 +121,9 @@ files.forEach(file => {
         </a>\n`;
 });
 
-// 读取首页模板，注入历史记录，生成最终的 index.html
+// 主页替换逻辑
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
-
-// 【同步加固】：主页的替换逻辑也同步做了防崩溃处理
-indexTpl = indexTpl.replace(//, () => historyListHtml);
-
+indexTpl = indexTpl.replace(//, function() { return historyListHtml; });
 fs.writeFileSync('index.html', indexTpl);
 
 console.log('所有静态页面生成完毕！');
