@@ -4,19 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{{DATE}}游戏圈日报——超哥版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* 这里保留之前的 CSS 样式，完全相同... 为了篇幅省略，请复制你之前的 style 内容 */
-        :root { --bg-color: #f0f2f5; --text-main: #1a1a1a; --text-light: #5c6b77; --text-meta: #909399; --card-bg: #ffffff; --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff; --tag-ai: #f6ffed; --tag-ai-text: #52c41a; --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96; --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16; --tag-featured: #fffbe6; --tag-featured-text: #faad14; }
+        :root { 
+            --bg-color: #f0f2f5; 
+            --text-main: #1a1a1a; 
+            --text-light: #5c6b77; 
+            --text-meta: #909399; 
+            --card-bg: #ffffff; 
+            --tag-chuhai: #e6f7ff; 
+            --tag-chuhai-text: #1890ff; 
+            --tag-ai: #f6ffed; 
+            --tag-ai-text: #52c41a; 
+            --tag-hangye: #fff0f6; 
+            --tag-hangye-text: #eb2f96; 
+            --tag-xiaoyouxi: #fff7e6; 
+            --tag-xiaoyouxi-text: #fa8c16; 
+            --tag-featured: #fffbe6; 
+            --tag-featured-text: #faad14; 
+        }
         * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); 
+            -webkit-tap-highlight-color: transparent; 
+        }
         .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        /* 新增：返回按钮样式 */
-        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
-        
-        .header { padding: 0 10px 16px; text-align: left; }
+        /* 顶部导航与工具栏 */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
+        .back-link { color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .btn-generate { 
+            background: #1890ff; color: #fff; border: none; padding: 6px 12px; border-radius: 16px; 
+            font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;
+            box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2); transition: background 0.2s;
+        }
+        .btn-generate:active { background: #096dd9; }
+        .btn-generate:disabled { background: #91caff; cursor: not-allowed; }
+
+        /* 截图区域容器 (确保截图背景色一致，并保留一定的内边距) */
+        #capture-area { background-color: var(--bg-color); padding: 10px; border-radius: 8px; }
+
+        .header { padding: 0 0 16px 0; text-align: left; }
         .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
+        
         .article-list { display: flex; flex-direction: column; gap: 8px; }
         .card { background: var(--card-bg); border-radius: 8px; padding: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
         .card:active { background-color: #f9fafc; }
@@ -34,20 +69,109 @@
         .tag.xiaoyouxi { background: var(--tag-xiaoyouxi); color: var(--tag-xiaoyouxi-text); }
         .source { font-weight: 500; margin-right: 8px; color: #8c8c8c; }
         .time { margin-left: auto; color: #bfbfbf; font-family: monospace; font-size: 10px; }
+
+        /* 图片预览弹窗样式 */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(0, 0, 0, 0.85); z-index: 9999; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; color: #fff; }
+        .modal-hint { font-size: 14px; font-weight: 500; color: #e6f7ff; }
+        .btn-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 15px; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .preview-container { 
+            flex: 1; width: 100%; max-width: 400px; padding: 0 20px 40px; 
+            overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; align-items: flex-start;
+        }
+        .preview-container img { width: 100%; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
+    <div class="top-bar">
         <a href="index.html" class="back-link">← 返回历史记录</a>
-        <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
-        <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
+        <button id="btn-generate" class="btn-generate">📸 生成分享图</button>
     </div>
-    <div class="article-list">
-<!-- CARDS_CONTENT_HERE -->
+
+    <div id="capture-area">
+        <div class="header">
+            <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
+            <p>共收录 {{COUNT}} 篇昨日头条 · 沉淀行业资讯</p>
+        </div>
+        <div class="article-list">
+</div>
     </div>
 </div>
+
+<div id="image-modal" class="modal">
+    <div class="modal-header">
+        <span class="modal-hint">👇 长按下方图片保存或分享</span>
+        <button id="btn-close" class="btn-close">×</button>
+    </div>
+    <div class="preview-container" id="preview-container">
+        </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const btnGenerate = document.getElementById('btn-generate');
+    const modal = document.getElementById('image-modal');
+    const btnClose = document.getElementById('btn-close');
+    const previewContainer = document.getElementById('preview-container');
+    const captureArea = document.getElementById('capture-area');
+
+    // 绑定生成图片事件
+    btnGenerate.addEventListener('click', function() {
+        // 按钮状态变为 loading
+        const originalText = btnGenerate.innerHTML;
+        btnGenerate.innerHTML = '⏳ 生成中...';
+        btnGenerate.disabled = true;
+
+        // 调用 html2canvas，配置高清放大倍数
+        html2canvas(captureArea, {
+            scale: window.devicePixelRatio || 2, // 确保移动端渲染高清
+            useCORS: true, // 允许跨域图片渲染
+            backgroundColor: '#f0f2f5' // 强制指定与底色相同的背景色
+        }).then(canvas => {
+            // 将 Canvas 转换为 Base64 图片数据流
+            const imgData = canvas.toDataURL('image/png');
+            
+            // 创建图片节点并放入预览容器
+            const img = document.createElement('img');
+            img.src = imgData;
+            previewContainer.innerHTML = ''; // 清空旧图
+            previewContainer.appendChild(img);
+
+            // 显示弹窗
+            modal.classList.add('show');
+            
+            // 恢复按钮状态
+            btnGenerate.innerHTML = originalText;
+            btnGenerate.disabled = false;
+        }).catch(err => {
+            console.error('图片生成失败:', err);
+            alert('图片生成失败，请重试');
+            btnGenerate.innerHTML = originalText;
+            btnGenerate.disabled = false;
+        });
+    });
+
+    // 绑定关闭弹窗事件
+    btnClose.addEventListener('click', function() {
+        modal.classList.remove('show');
+    });
+
+    // 点击遮罩层也可以关闭弹窗
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target === previewContainer) {
+            modal.classList.remove('show');
+        }
+    });
+});
+</script>
 
 </body>
 </html>
