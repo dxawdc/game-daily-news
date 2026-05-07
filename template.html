@@ -9,14 +9,13 @@
         :root { --bg-color: #f0f2f5; --text-main: #1a1a1a; --text-light: #5c6b77; --text-meta: #909399; --card-bg: #ffffff; --tag-chuhai: #e6f7ff; --tag-chuhai-text: #1890ff; --tag-ai: #f6ffed; --tag-ai-text: #52c41a; --tag-hangye: #fff0f6; --tag-hangye-text: #eb2f96; --tag-xiaoyouxi: #fff7e6; --tag-xiaoyouxi-text: #fa8c16; --tag-featured: #fffbe6; --tag-featured-text: #faad14; }
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 800px; margin: 0 auto; padding: 10px; }
         
-        /* 容器直接作为截图背景 */
-        .container { max-width: 800px; margin: 0 auto; padding: 10px; background-color: var(--bg-color); border-radius: 8px; }
+        .back-link { display: inline-block; margin-bottom: 12px; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
         
         .header { padding: 0 10px 16px; text-align: left; }
         .header h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
         .header p { margin: 4px 0 0; color: var(--text-meta); font-size: 12px; }
-        
         .article-list { display: flex; flex-direction: column; gap: 8px; }
         .card { background: var(--card-bg); border-radius: 8px; padding: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
         .card:active { background-color: #f9fafc; }
@@ -35,13 +34,7 @@
         .source { font-weight: 500; margin-right: 8px; color: #8c8c8c; }
         .time { margin-left: auto; color: #bfbfbf; font-family: monospace; font-size: 10px; }
 
-        /* 新增：工具栏与按钮样式 */
-        .back-link { display: inline-block; color: #1890ff; text-decoration: none; font-size: 14px; font-weight: 500; }
-        .btn-generate { background: #1890ff; color: #fff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2); transition: background 0.2s; }
-        .btn-generate:active { background: #096dd9; }
-        .btn-generate:disabled { background: #91caff; cursor: not-allowed; }
-
-        /* 图片预览弹窗样式 */
+        /* 新增：弹窗组件样式 */
         .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal.show { opacity: 1; pointer-events: auto; }
         .modal-header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; color: #fff; }
@@ -53,12 +46,9 @@
 </head>
 <body>
 
-<div class="container" id="capture-area">
+<div class="container">
     <div class="header">
-        <div data-html2canvas-ignore="true" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <a href="index.html" class="back-link">← 返回历史记录</a>
-            <button id="btn-generate" class="btn-generate">📸 生成分享图</button>
-        </div>
+        <a href="index.html" class="back-link">← 返回历史记录</a>
         <h1>🎮 {{DATE}}游戏圈日报——超哥版</h1>
         <p>共收录 {{COUNT}} 篇昨日头条 · 点击卡片直接阅读</p>
     </div>
@@ -71,28 +61,55 @@
         <span class="modal-hint">👇 长按下方图片保存或分享</span>
         <button id="btn-close" class="btn-close">×</button>
     </div>
-    <div class="preview-container" id="preview-container">
-        </div>
+    <div class="preview-container" id="preview-container"></div>
 </div>
 
 <script>
+// 使用纯 JS 动态注入交互，100% 保护你的原始 HTML DOM 结构不被破坏
 document.addEventListener("DOMContentLoaded", function() {
-    const btnGenerate = document.getElementById('btn-generate');
+    const header = document.querySelector('.header');
+    const backLink = document.querySelector('.back-link');
+    const container = document.querySelector('.container');
+
+    // 1. 动态构建顶部工具栏（不会影响 build.js 的静态解析）
+    const topRow = document.createElement('div');
+    topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
+    // 关键属性：截图时自动忽略这行工具栏
+    topRow.setAttribute('data-html2canvas-ignore', 'true'); 
+
+    const btnGenerate = document.createElement('button');
+    btnGenerate.innerHTML = '📸 生成分享图';
+    btnGenerate.style.cssText = 'background: #1890ff; color: #fff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(24,144,255,0.2); display: flex; align-items: center;';
+    
+    // 组装顶部按钮
+    backLink.style.marginBottom = '0';
+    header.insertBefore(topRow, header.firstChild);
+    topRow.appendChild(backLink);
+    topRow.appendChild(btnGenerate);
+
+    // 2. 绑定截图与弹窗逻辑
     const modal = document.getElementById('image-modal');
     const btnClose = document.getElementById('btn-close');
     const previewContainer = document.getElementById('preview-container');
-    const captureArea = document.getElementById('capture-area');
 
     btnGenerate.addEventListener('click', function() {
         const originalText = btnGenerate.innerHTML;
         btnGenerate.innerHTML = '⏳ 生成中...';
         btnGenerate.disabled = true;
+        btnGenerate.style.background = '#91caff';
 
-        html2canvas(captureArea, {
+        // 临时锁定背景色，防止长图透明底发黑
+        const originalBg = container.style.backgroundColor;
+        container.style.backgroundColor = '#f0f2f5';
+        container.style.borderRadius = '8px';
+
+        html2canvas(container, {
             scale: window.devicePixelRatio || 2, 
             useCORS: true,
-            backgroundColor: '#f0f2f5' 
+            backgroundColor: '#f0f2f5'
         }).then(canvas => {
+            container.style.backgroundColor = originalBg; // 截图完恢复原样
+            
             const imgData = canvas.toDataURL('image/png');
             const img = document.createElement('img');
             img.src = imgData;
@@ -101,27 +118,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
             modal.classList.add('show');
             
+            // 恢复按钮状态
             btnGenerate.innerHTML = originalText;
             btnGenerate.disabled = false;
+            btnGenerate.style.background = '#1890ff';
         }).catch(err => {
+            container.style.backgroundColor = originalBg;
             console.error('图片生成失败:', err);
             alert('图片生成失败，请重试');
             btnGenerate.innerHTML = originalText;
             btnGenerate.disabled = false;
+            btnGenerate.style.background = '#1890ff';
         });
     });
 
-    btnClose.addEventListener('click', function() {
-        modal.classList.remove('show');
-    });
-
+    // 弹窗关闭逻辑
+    btnClose.addEventListener('click', function() { modal.classList.remove('show'); });
     modal.addEventListener('click', function(e) {
-        if (e.target === modal || e.target === previewContainer) {
-            modal.classList.remove('show');
-        }
+        if (e.target === modal || e.target === previewContainer) { modal.classList.remove('show'); }
     });
 });
 </script>
-
 </body>
 </html>
