@@ -11,7 +11,10 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt')).sort().reverse();
-if (files.length === 0) { console.log('No data found in data/ folder.'); process.exit(0); }
+if (files.length === 0) { 
+    console.log('No data found in data/ folder.'); 
+    process.exit(0); 
+}
 
 let historyListHtml = '';
 const articleTemplate = fs.readFileSync('template.html', 'utf-8');
@@ -61,7 +64,7 @@ files.forEach(file => {
         .replace(/\{\{DATE\}\}/g, reportDate)
         .replace(/\{\{COUNT\}\}/g, reportCount);
 
-    // 双重保险替换逻辑
+    // 双重保险替换逻辑 (确保这里的括号完整匹配)
     if (//.test(pageHtml)) {
         pageHtml = pageHtml.replace(//, cardsHtml);
     } else {
@@ -82,10 +85,12 @@ files.forEach(file => {
 });
 
 let indexTpl = fs.readFileSync('index_template.html', 'utf-8');
+
 if (//.test(indexTpl)) {
     indexTpl = indexTpl.replace(//, historyListHtml);
 } else {
     indexTpl = indexTpl.replace('<div class="history-list">', '<div class="history-list">\n' + historyListHtml);
 }
+
 fs.writeFileSync('index.html', indexTpl);
 console.log('Build Success!');
