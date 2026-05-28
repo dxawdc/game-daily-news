@@ -1,16 +1,184 @@
-1. 超40个项目发布之外，腾讯游戏的发布会还在发什么？
+1. 男性也爱玩消除？三次立项，一周上线，从“没法变现”到日活百万，《一箭又一箭》如何从“必死”立项起死回生？
+   公众号：罗斯基    分类：买量投放
+   摘要：从“太简单没法变现”到日活百万：《一箭又一箭》的立项启示录
+   发布时间：2026/05/27 22:36
+   原文链接：https://mp.weixin.qq.com/s/uinwnweFLLXuuWCiXaEerA
+
+2. 首发新游5000万免分成、老游戏“消一赠一”，微信小游戏疯狂让利开发者
+   公众号：罗斯基    分类：小游戏
+   摘要：5亿月活、日均60分钟时长，微信小游戏迈向“长青”新阶段
+   发布时间：2026/05/27 22:36
+   原文链接：https://mp.weixin.qq.com/s/UTghfjjrajZk5EhQLVipxw
+
+3. 爆款小游戏《打个螺丝》如何立项调优？一款2D打螺丝凭啥能火600天？
+   公众号：罗斯基    分类：小游戏
+   摘要：为什么一款2D打螺丝游戏能火600天？《打个螺丝》的长期主义实验
+   发布时间：2026/05/27 22:36
+   原文链接：https://mp.weixin.qq.com/s/g-l66s6kldEfF1y5D5TyGA
+
+4. 刚刚的腾讯游戏发布会：意料之外？情理之中
+   公众号：游戏葡萄    分类：行业动态
+   摘要：突破基因锁，走向新时代。
+   发布时间：2026/05/27 21:50
+   原文链接：https://mp.weixin.qq.com/s/aNs62ENWTqZ8DQm2Q6nW3A
+
+5. 腾讯游戏大爆发？公布15款待发新品，首曝AI游戏平台
+   公众号：游戏葡萄    分类：AI技术
+   摘要：全都要，全都有。
+   发布时间：2026/05/27 21:50
+   原文链接：https://mp.weixin.qq.com/s/v5xnVZUlcFBGUBa0aDUw8Q
+
+6. 微信小游戏：80款DAU超百万，IAP首发流水5000万内不分成
+   公众号：游戏葡萄    分类：小游戏
+   摘要：还在涨？
+   发布时间：2026/05/27 13:45
+   原文链接：https://mp.weixin.qq.com/s/tzNv7Hg4mZejr_25otZ1MA
+
+7. 超40款游戏公布最新动态，腾讯今年的发布会还带来了多项游戏AI应用新进展
+   公众号：GameRes游资网    分类：AI技术
+   摘要：5月27日，SPARK2026腾讯游戏发布会在线上举行。
+   发布时间：2026/05/27 22:32
+   原文链接：https://mp.weixin.qq.com/s/JBfAzkIyLJUrun1xFI8E9w
+
+8. 微信小游戏9年：5亿活跃用户、50万+开发者，PC端成小游戏第二增长曲线
+   公众号：GameRes游资网    分类：小游戏
+   摘要：5月27日，2026微信小游戏开发者大会在杭州举行。
+   发布时间：2026/05/27 22:32
+   原文链接：https://mp.weixin.qq.com/s/bNF5-xPgbjUIj0TnITfKCQ
+
+9. 突破5000万DAU后，这款射击游戏要把传世宝藏做成“大红”
+   公众号：游戏陀螺    分类：行业动态
+   摘要：让历史文化在虚拟世界中再度鲜活。
+   发布时间：2026/05/27 23:23
+   原文链接：https://mp.weixin.qq.com/s/VWi3HlYus_9aWaQfJcWTlg
+
+10. 微信公开课释放重磅信号：5亿月活、80款百万日活、300款千万流水
+   公众号：游戏陀螺    分类：小游戏
+   摘要：多项重磅数据曝光。
+   发布时间：2026/05/27 17:34
+   原文链接：https://mp.weixin.qq.com/s/BGfXdeg1tElE54XbkIp4IQ
+
+11. 超40个项目发布之外，腾讯游戏的发布会还在发什么？
    公众号：GameLook    分类：行业动态
    摘要：暂无摘要
    发布时间：2026/05/27 23:38
    原文链接：https://mp.weixin.qq.com/s/lnt2EsNENIa3WRgjGj3eoA
 
-2. ARR 5亿美元，可灵真正的考验才刚刚开始？｜财报解读
+12. 海外全球发布！莉莉丝新游戏“换配方”，要杀入这个百亿赛道！
+   公众号：GameLook    分类：出海
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/TpZlVr2D84n38gY-rn8q0Q
+
+13. 网易再添王牌 “古风打一切”！腾讯：你又又又来这招？
+   公众号：GameLook    分类：行业动态
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/u3hevn3HGyjVzwKaJU3j3A
+
+14. 微信杨静怡：IAP小游戏MAU3亿，SLG和MMO稳健，模拟收入增200%二合70%
+   公众号：GameLook    分类：小游戏
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/rbIcd8HTPAyCIu3UFmFiig
+
+15. 微信翁裕淦：IAA小游戏MAU 4亿、70%玩家只玩IAA，收入增长30%
+   公众号：GameLook    分类：小游戏
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/OpxCgz7iTbPSo5ES7UIFiQ
+
+16. 微信李卿：小游戏月活用户破5亿，日均时长超1小时，已跑通iOS支付
+   公众号：GameLook    分类：小游戏
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/PmFErTixeu-UEE-pho6HZQ
+
+17. 微信孟令刚：PC小游戏付费用户ARPU增长130%，在线时长增长100%
+   公众号：GameLook    分类：小游戏
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/7ejCdqh90u0UF7TkLzClzQ
+
+18. 又肝又氪！新游《坦克世界: HEAT》Steam差评如潮，Wargaming翻车了？
+   公众号：GameLook    分类：行业动态
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:38
+   原文链接：https://mp.weixin.qq.com/s/XVovNIoEEHT9_y5Nie2ODQ
+
+19. 一口气放出42款——今晚，腾讯全“摊牌”了
+   公众号：游戏那点事Gamez    分类：行业动态
+   摘要：可以预见，2026将会是火力全开的一年。
+   发布时间：2026/05/27 22:17
+   原文链接：https://mp.weixin.qq.com/s/FtvTyBIjeyyScy_OwhuNWQ
+
+20. 微信小游戏赚麻了：超80款DAU破百万，超300款季度流水破1000万
+   公众号：游戏那点事Gamez    分类：小游戏
+   摘要：真金白银解决开发者痛点。
+   发布时间：2026/05/27 22:17
+   原文链接：https://mp.weixin.qq.com/s/fbH6wAyidqT-E3wnm4iFtQ
+
+21. 米哈游8大在研项目曝光：大伟哥真舍得花钱搞AI
+   公众号：游戏那点事Gamez    分类：AI技术
+   摘要：AI将会是米哈游在未来产品探索当中的一大重要方向。
+   发布时间：2026/05/27 18:34
+   原文链接：https://mp.weixin.qq.com/s/aZ3-RzG0AIxn0ARYsj_kHQ
+
+22. 在游戏里加入600个AI NPC，它们自己能把日子过好吗？
+   公众号：游戏研究社    分类：AI技术
+   摘要：总需要有人吃螃蟹。
+   发布时间：2026/05/27 23:04
+   原文链接：https://mp.weixin.qq.com/s/eUjJfKWuQTelJOHl2VPXTg
+
+23. 42款游戏集中亮相，今年的腾讯游戏发布会，从头到尾都是重点
+   公众号：游戏研究社    分类：行业动态
+   摘要：量大，管饱。
+   发布时间：2026/05/27 23:04
+   原文链接：https://mp.weixin.qq.com/s/y5uVtdwpOmd0QXgNnaY2OA
+
+24. 《星际公民》众筹金额正式突破10亿美金，现在做得怎么样了
+   公众号：游戏研究社    分类：行业动态
+   摘要：暂无摘要
+   发布时间：2026/05/27 23:04
+   原文链接：https://mp.weixin.qq.com/s/u5AwmTqEc_MvsebeJt25nQ
+
+25. ARR 5亿美元，可灵真正的考验才刚刚开始？｜财报解读
    公众号：白鲸出海    分类：行业动态
    摘要：大盘承压，可灵赚钱。
    发布时间：2026/05/27 21:16
    原文链接：https://mp.weixin.qq.com/s/bMYdQAh6IQZwUbK-kWKwcw
 
-3. 抖音「游戏特色人群」洞察：亿级用户画像提炼，9大细分人群如何获取？
+26. 字节All in AI基建，年投入或超700亿美元，超过阿里腾讯投入总和
+   公众号：白鲸出海    分类：AI技术
+   摘要：字节开始中国互联网最激进的 AI 基建扩张。
+   发布时间：2026/05/27 21:16
+   原文链接：https://mp.weixin.qq.com/s/DTyZMwtya6-LcLFDeBzWUg
+
+27. 阅文集团在海外上线漫剧平台，谷歌旗下基金领投OpenRouter B轮融资｜一句话看出海新鲜事
+   公众号：白鲸出海    分类：出海
+   摘要：Stability AI 发布新一系列音频开源模型。
+   发布时间：2026/05/27 17:02
+   原文链接：https://mp.weixin.qq.com/s/y6S8Yd6ZHXpO7cVrbtZv5Q
+
+28. AI“养肥”卡路里追踪App
+   公众号：白鲸出海    分类：出海
+   摘要：Sensor Tower 数据显示，在 AI 的赋能下，健康品类在过去一年的 IAP 增长了 14%，卡路里追踪 App「Cal AI」被当做优秀案例展示。实际上，这条赛道并非「Cal AI」一家的光鲜，AI，正持续“改造”这一品类。
+
+2026 年 Q1，我们通过 AppMagic 整理出 13 款同类 App 月均流水超过百万美元，2025 年同期仅为 8 款。
+
+AI 能力的引入、交互创新解决品类“遗留痛点”、进一步降低录入数据的摩擦并与目标强关联等策略将 2024 年上线的 3 款新品送过月流水百万美元的门槛。而卡路里追踪与饮食文化的强关联，导致在当下，区域市场机会仍在，已有国内团队入局并小有成绩。
+
+关于该品类的更多解读，可参考白鲸出海选题《<a data-unique-id="mpnogal9-e4xhve" href="https://mp.weixin.qq.com/s?__biz=MzA3NTQ4NjczNw==&amp;mid=2650680482&amp;idx=1&amp;sn=0e17548ec6c1941635a0d8fd4430a67d&amp;scene=142#wechat_redirect" class="normal_text_link mp_article_text_link" target="_blank" data-itemshowtype="0">AI“养肥”卡路里追踪，13款产品月流水过百万美元</a>》。
+   发布时间：2026/05/27 15:12
+   原文链接：https://mp.weixin.qq.com/s/wHlSnhrXbl4x-gyTEPZrEA
+
+29. 微信小游戏开发者大会：首发新游最高 5000万不分成！一IAP品类增速达210%、PC投放消耗增长35%！
+   公众号：DataEye游戏观察    分类：小游戏
+   摘要：暂无摘要
+   发布时间：2026/05/27 14:06
+   原文链接：https://mp.weixin.qq.com/s/0JucYPjjVFrDHsQZqAns6g
+
+30. 抖音「游戏特色人群」洞察：亿级用户画像提炼，9大细分人群如何获取？
    公众号：游戏产业报告    分类：行业动态
    摘要：为什么要在抖音寻找特色人群？又将如何放大内容营销效果？
    发布时间：2026/05/27 14:00
